@@ -6,7 +6,7 @@ class Model(nn.Module):
     def __init__(self, args):
         super(Model, self).__init__()
 
-        self.Linear = nn.Linear(args.d_in, args.d_out)
+        self.linear = nn.Linear(args.d_in, args.d_out)
 
     def forward(self, x):
-        return self.Linear(x)
+        return self.linear(x)
