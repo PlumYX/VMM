@@ -5,8 +5,8 @@ class Monolayer_MLP(nn.Module):
     def __init__(self, d_in, d_out, layer_norm=True, act_func='GELU', dropout=.0):
         super(Monolayer_MLP, self).__init__()
 
-        self.Linear = nn.Linear(d_in, d_out)
-        self.LayerNorm = nn.LayerNorm(d_out) if layer_norm else None
+        self.linear = nn.Linear(d_in, d_out)
+        self.layer_norm = nn.LayerNorm(d_out) if layer_norm else None
         act_func_dict = {
             'ReLU': nn.ReLU(), 
             'ReLU6': nn.ReLU6(), 
@@ -15,14 +15,14 @@ class Monolayer_MLP(nn.Module):
             'Sigmoid': nn.Sigmoid(), 
             'Tanh': nn.Tanh()
         }
-        self.ActFunc = act_func_dict[act_func]
-        self.Dropout = nn.Dropout(dropout)
+        self.act_func = act_func_dict[act_func]
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        if self.LayerNorm:
-            return self.Dropout(self.ActFunc(self.LayerNorm(self.Linear(x))))
+        if self.layer_norm:
+            return self.dropout(self.act_func(self.layer_norm(self.linear(x))))
         else:
-            return self.Dropout(self.ActFunc(self.Linear(x)))
+            return self.dropout(self.act_func(self.linear(x)))
 
 
 class Model(nn.Module):
