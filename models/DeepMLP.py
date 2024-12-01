@@ -27,6 +27,7 @@ class Monolayer_MLP(nn.Module):
 
 
 class Model(nn.Module):
+    ''' DeepMLP Model '''
     def __init__(self, configs):
         super(Model, self).__init__()
 
