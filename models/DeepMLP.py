@@ -19,33 +19,26 @@ class Monolayer_MLP(nn.Module):
         self.Dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        x = self.Linear(x)
-        x = self.LayerNorm(x) if self.LayerNorm else x
-        x = self.ActFunc(x)
-        x = self.Dropout(x)
-        return x
+        if self.LayerNorm:
+            return self.Dropout(self.ActFunc(self.LayerNorm(self.Linear(x))))
+        else:
+            return self.Dropout(self.ActFunc(self.Linear(x)))
 
 
 class Model(nn.Module):
-    ''' DeepMLP Model '''
+    ''' Deep multilayer perceptron '''
     def __init__(self, configs):
         super(Model, self).__init__()
 
         self.e_layers = configs.e_layers
         self.embedding_mapping = Monolayer_MLP(
-            configs.d_in, 
-            configs.d_model, 
-            configs.layer_norm, 
-            configs.act_func, 
-            configs.dropout
+            configs.d_in, configs.d_model, 
+            configs.layer_norm, configs.act_func, configs.dropout
         )
         self.mlp_blacks = nn.ModuleList([
             Monolayer_MLP(
-                configs.d_model, 
-                configs.d_model, 
-                configs.layer_norm, 
-                configs.act_func, 
-                configs.dropout
+                configs.d_model, configs.d_model, 
+                configs.layer_norm, configs.act_func, configs.dropout
             ) for _ in range(configs.e_layers-1)
         ]) if configs.e_layers != 1 else None
         self.projection = nn.Linear(configs.d_model, configs.d_out)
