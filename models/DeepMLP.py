@@ -33,15 +33,21 @@ class Model(nn.Module):
 
         self.e_layers = configs.e_layers
         self.embedding_mapping = Monolayer_MLP(
-            configs.d_in, configs.d_model, 
-            configs.layer_norm, configs.act_func, configs.dropout
-            )
+            configs.d_in, 
+            configs.d_model, 
+            configs.layer_norm, 
+            configs.act_func, 
+            configs.dropout
+        )
         self.mlp_blacks = nn.ModuleList([
             Monolayer_MLP(
-                configs.d_model, configs.d_model, 
-                configs.layer_norm, configs.act_func, configs.dropout
-                ) for _ in range(configs.e_layers-1)
-            ]) if configs.e_layers != 1 else None
+                configs.d_model, 
+                configs.d_model, 
+                configs.layer_norm, 
+                configs.act_func, 
+                configs.dropout
+            ) for _ in range(configs.e_layers-1)
+        ]) if configs.e_layers != 1 else None
         self.projection = nn.Linear(configs.d_model, configs.d_out)
 
     def forward(self, x):
