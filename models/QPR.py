@@ -6,10 +6,10 @@ class Square_items(nn.Module):
     def __init__(self, in_features, out_features):
         super(Square_items, self).__init__()
 
-        self.fc = nn.Linear(in_features, out_features)
+        self.linear = nn.Linear(in_features, out_features)
 
     def forward(self, x):
-        return self.fc(x*2)
+        return self.linear(x*2)
 
 
 class Cross_items(nn.Module):
@@ -19,7 +19,7 @@ class Cross_items(nn.Module):
         self.sampling = sampling
         self.sampling_len = math.ceil(in_features / sampling)
         num_cross = int(self.sampling_len * (self.sampling_len - 1) / 2)
-        self.fc = nn.Linear(num_cross, out_features)
+        self.linear = nn.Linear(num_cross, out_features)
 
     def forward(self, x):
         x_sampling = x
@@ -29,7 +29,7 @@ class Cross_items(nn.Module):
             torch.ones((self.sampling_len, self.sampling_len), dtype=torch.bool), 
             diagonal=1)
         cross_item = cross_item[:, cross_index]
-        return self.fc(cross_item)
+        return self.linear(cross_item)
 
 
 class Model(nn.Module):
@@ -37,9 +37,9 @@ class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()
 
-        self.linear = nn.Linear(configs.d_in, configs.d_out)
-        self.cross = Cross_items(configs.d_in, configs.d_out)
+        self.linear_items = nn.Linear(configs.d_in, configs.d_out)
+        self.cross_items = Cross_items(configs.d_in, configs.d_out)
         self.square_items = Square_items(configs.d_in, configs.d_out)
 
     def forward(self, x):
-        return self.linear(x) + self.cross(x) + self.square_items(x)
+        return self.linear_items(x) + self.cross_items(x) + self.square_items(x)
