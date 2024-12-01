@@ -7,7 +7,8 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-class Common_Regression_Dataset(Dataset):
+
+class Common_Regression_Data(Dataset):
     def __init__(self, root_path='.\datasets',
                  input_data_path='input.csv',
                  output_data_path='output.csv',
