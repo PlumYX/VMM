@@ -10,48 +10,48 @@ warnings.filterwarnings('ignore')
 
 class Common_Regression_Data(Dataset):
     def __init__(self, root_path='.\datasets',
-                 input_data_path='input.csv',
-                 output_data_path='output.csv',
-                 input_index=None,
-                 outpur_index=None,
+                 model_input_data_path='data.csv',
+                 model_output_data_path=None,
+                 input_index='all',
+                 output_index='all',
                  flag='train',
+                 data_file_suffix='csv',
                  scale=True):
 
-        assert flag in ['train', 'test', 'val']
-        type_map = {'train': 0, 'val': 1, 'test': 2}
-        self.set_type = type_map[flag]
+        """ input_index & output_index: list or 'all' """
 
-        self.scale = scale
+        assert flag in ['train', 'val', 'test', 'deploy']
+        self.flag = flag
         self.root_path = root_path
-        self.data_path = data_path
+        self.model_input_data_path = model_input_data_path
+        self.model_output_data_path = model_output_data_path \
+            if model_output_data_path else model_input_data_path
+        self.input_index = input_index
+        self.output_index = output_index
+        self.scale = scale
         self.__read_data__()
 
     def __read_data__(self):
-        self.scaler = StandardScaler()
+        df_raw = pd.read_hdf(os.path.join(self.root_path, self.model_input_data_path))
 
-        df_raw = pd.read_hdf(os.path.join(self.root_path, self.data_path))
-
-        x_columns = ['Time', 'x-coordinate', 'y-coordinate', 'z-coordinate', 
-                     'Pump-mflowj', 'Rktpow', 'SG-in2-tempf', 'main-P', 'SG-in1-tempf', 'SG-in2-mflowj']
-
-        y_columns = ['velocity-magnitude', 'temperature', 'phase-2-vof', 
-                     'tav-outlet1&2(outlet_1)', 'tav-outlet1&2(outlet_2)']
-
+        x_columns = self.input_index
+        y_columns = self.input_index
         data_columns = x_columns + y_columns
         df_data = df_raw[data_columns]
 
         if self.scale:
+            self.scaler = StandardScaler()
             train_data = df_data[0::2]
             self.scaler.fit(train_data.values)
             data = self.scaler.transform(df_data.values)
         else:
             data = df_data.values
         
-        if self.set_type == 0:    # Train
+        if self.flag == 'train':
             self.data_x, self.data_y = data[0::2, 0:10], data[0::2, 10:]
-        elif self.set_type == 1:  # Val
+        elif self.flag == 'val':
             self.data_x, self.data_y = data[1::4, 0:10], data[1::4, 10:]
-        else:                     # Test
+        elif self.flag == 'val':
             self.data_x, self.data_y = data[3::4, 0:10], data[3::4, 10:]
 
     def __getitem__(self, index):
@@ -80,7 +80,7 @@ def data_provider(args, flag):
         drop_last = True
         batch_size = args.batch_size
 
-    data_set = Common_Dataset(root_path=args.root_path, data_path=args.data_path, flag=flag)
+    data_set = Common_Regression_Data(root_path=args.root_path, data_path=args.data_path, flag=flag)
     print(flag.capitalize(), 'dataset:', len(data_set))
 
     data_loader = DataLoader(data_set, batch_size=batch_size, shuffle=shuffle_flag, 
