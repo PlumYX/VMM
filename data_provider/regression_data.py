@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-class Common_Regression_Data(Dataset):
+class Common_Dataset(Dataset):
     def __init__(self, root_path='.\datasets',
                  model_input_data_path='data.csv',
                  model_output_data_path=None,
@@ -46,7 +46,7 @@ class Common_Regression_Data(Dataset):
             data = self.scaler.transform(df_data.values)
         else:
             data = df_data.values
-        
+
         if self.flag == 'train':
             self.data_x, self.data_y = data[0::2, 0:10], data[0::2, 10:]
         elif self.flag == 'val':
