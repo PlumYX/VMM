@@ -7,12 +7,12 @@ class Monolayer_KAN(nn.Module):
     def __init__(self, d_in, d_out, layer_norm=True):
         super(Monolayer_KAN, self).__init__()
 
-        self.KanLayer = KANLayer(d_in, d_out)
-        self.LayerNorm = nn.LayerNorm(d_out) if layer_norm else None
+        self.kan_layer = KANLayer(d_in, d_out)
+        self.layer_norm = nn.LayerNorm(d_out) if layer_norm else None
 
     def forward(self, x):
         x, _, _, _ = self.KanLayer(x)
-        x = self.LayerNorm(x) if self.LayerNorm else x
+        x = self.layer_norm(x) if self.layer_norm else x
         return x
 
 
