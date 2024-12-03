@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from layers.KANLayer import KANLayer  # type: ignore
+from layers.KANLayer import KANLayer
 
 class Monolayer_KAN(nn.Module):
     def __init__(self, d_in, d_out, layer_norm=True):
